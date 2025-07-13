@@ -1,5 +1,5 @@
 const express = require('express');
-const Order = require('./Order');
+const Order = require('../models/Order');
 const PaymentService = require('../services/PaymentService');
 const authenticateToken = require('../middleware/auth');
 
