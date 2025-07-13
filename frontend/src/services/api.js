@@ -2,24 +2,17 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle token expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,47 +25,25 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
 export const authAPI = {
-  login: (credentials) => api.post('/merchants/login', credentials),
-  register: (userData) => api.post('/merchants/register', userData),
+  login: (credentials) => Promise.resolve({ data: { token: 'mock-token', merchant: { businessName: 'Test Merchant', email: 'test@ghala.com' } } }),
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
 };
 
-// Merchant API
-export const merchantAPI = {
-  getProfile: () => api.get('/merchants/profile'),
-  updatePaymentMethod: (data) => api.put('/merchants/payment-method', data),
-  getPaymentMethod: () => api.get('/merchants/payment-method'),
-};
-
-// Orders API
 export const ordersAPI = {
-  getOrders: () => api.get('/orders'),
-  createOrder: (orderData) => api.post('/orders', orderData),
-  updateOrder: (orderId, data) => api.put(`/orders/${orderId}`, data),
-  deleteOrder: (orderId) => api.delete(`/orders/${orderId}`),
-  confirmPayment: (orderId) => api.post(`/orders/${orderId}/confirm-payment`),
-  getOrderStats: () => api.get('/orders/stats'),
-};
-
-// Utility functions
-export const getToken = () => localStorage.getItem('token');
-export const getUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
-};
-
-export const setAuthData = (token, user) => {
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
-};
-
-export const isAuthenticated = () => {
-  return !!getToken();
+  getOrders: () => Promise.resolve({
+    data: [
+      { id: 1, product: 'Magic Mug', total: 10.99, status: 'pending', timestamp: new Date().toISOString() },
+      { id: 2, product: 'Dream Pillow', total: 15.49, status: 'paid', timestamp: new Date().toISOString() },
+    ],
+  }),
+  updateOrder: (orderId, data) => {
+    console.log(`Updating order ${orderId} with ${JSON.stringify(data)}`);
+    return Promise.resolve({ data: { ...data, id: orderId } });
+  },
 };
 
 export default api;
