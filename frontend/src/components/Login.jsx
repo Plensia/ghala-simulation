@@ -1,120 +1,192 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, Store } from 'lucide-react';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const { login, register } = useAuth();
+  const { login, register, loading, error, clearError, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    const result = isLogin 
-      ? await login({ email: formData.email, password: formData.password })
-      : await register(formData);
-
-    if (!result.success) {
-      setError(result.error);
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
     }
-    
-    setLoading(false);
-  };
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    clearError();
+  }, [isLogin, clearError]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (isLogin) {
+      const result = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (result.success) {
+        navigate('/dashboard');
+      }
+    } else {
+      const result = await register(formData);
+      
+      if (result.success) {
+        navigate('/dashboard');
+      }
+    }
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setFormData({ name: '', email: '', password: '' });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {isLogin ? 'Login' : 'Register'}
-          </h2>
-          <p className="text-gray-600 mt-2">
-            {isLogin ? 'Welcome back!' : 'Create your merchant account'}
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+            <Store className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome to Ghala
+          </h1>
+          <p className="text-gray-600">
+            {isLogin ? 'Sign in to your merchant account' : 'Create your merchant account'}
           </p>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+        {/* Form */}
+        <div className="card">
+          <div className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Name field (only for registration) */}
+              {!isLogin && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    Business Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="input-field pl-10"
+                      placeholder="Enter your business name"
+                      required={!isLogin}
+                    />
+                  </div>
+                </div>
+              )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              {/* Email field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="input-field pl-10"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="input-field pl-10 pr-10"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full flex items-center justify-center space-x-2"
+              >
+                {loading ? (
+                  <div className="spinner"></div>
+                ) : (
+                  <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                )}
+              </button>
+            </form>
+
+            {/* Toggle mode */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button
+                  type="button"
+                  onClick={toggleMode}
+                  className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  {isLogin ? 'Sign up' : 'Sign in'}
+                </button>
+              </p>
             </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading ? 'Loading...' : (isLogin ? 'Login' : 'Register')}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
-          </button>
+        {/* Footer */}
+        <div className="text-center mt-8 text-sm text-gray-500">
+          <p>© 2024 Ghala. All rights reserved.</p>
         </div>
       </div>
     </div>
