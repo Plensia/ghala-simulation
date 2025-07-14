@@ -15,17 +15,17 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-brand-white shadow-sm border-b border-gray-200">
+      <header className="bg-logo-cream shadow-sm border-b border-logo-gold">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <img src="/shop-local-logo.png" alt="Shop Local Logo" className="h-10 w-auto mr-3" style={{filter: 'drop-shadow(0 2px 4px #0055FF)'}} />
-            </div>
+          <div className="flex items-center">
+            <img src="/logo.svg" alt="Shop Local Logo" className="h-12 w-auto mr-3" style={{filter: 'drop-shadow(0 2px 4px #4ad9c3)'}} />
+          </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-brand-darkgray">Welcome, {user?.name}</span>
+              <span className="text-sm text-logo-deeporange font-semibold">Welcome, {user?.name}</span>
               <button
                 onClick={logout}
-                className="bg-brand-blue text-brand-white px-4 py-2 rounded-md hover:bg-brand-darkgray transition-colors"
+                className="bg-logo-teal text-logo-cream px-4 py-2 rounded-md hover:bg-logo-orange transition-colors font-bold"
               >
                 Logout
               </button>
@@ -35,17 +35,17 @@ const Dashboard = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-logo-cream border-b border-logo-gold">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`py-4 px-1 border-b-2 font-bold text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-logo-orange text-logo-deeporange'
+                    : 'border-transparent text-logo-gold hover:text-logo-orange hover:border-logo-gold'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>
@@ -57,7 +57,7 @@ const Dashboard = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-logo-cream">
         {activeTab === 'orders' && <OrderList />}
         {activeTab === 'settings' && <MerchantSettings />}
       </main>

@@ -83,93 +83,93 @@ const MerchantSettings = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Provider
-              </label>
-              <select
-                value={formData.provider}
-                onChange={(e) => setFormData(prev => ({...prev, provider: e.target.value}))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Select Provider</option>
-                <option value="mpesa">M-Pesa</option>
-                <option value="airtel">Airtel Money</option>
-                <option value="tigo">Tigo Pesa</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Business Number
-              </label>
-              <input
-                type="text"
-                value={formData.config.businessNumber || ''}
-                onChange={(e) => handleConfigChange('businessNumber', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter business number"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                API Key
-              </label>
-              <input
-                type="password"
-                value={formData.config.apiKey || ''}
-                onChange={(e) => handleConfigChange('apiKey', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter API key"
-                required
-              />
+    <div className="max-w-2xl mx-auto">
+      <div className="bg-logo-cream rounded-lg shadow-sm border border-logo-gold p-6">
+        <h2 className="text-2xl font-bold text-logo-deeporange mb-6">Merchant Payment Settings</h2>
+
+        {/* Current Settings Display */}
+        {currentSettings && (
+          <div className="mb-6 p-4 bg-logo-teal rounded-lg border border-logo-gold">
+            <h3 className="font-semibold text-logo-cream mb-2">Current Settings</h3>
+            <div className="text-sm text-logo-cream">
+              <p><strong>Payment Method:</strong> {currentSettings.paymentMethod}</p>
+              <p><strong>Provider:</strong> {currentSettings.provider}</p>
+              <p><strong>Label:</strong> {currentSettings.label}</p>
             </div>
           </div>
-        );
+        )}
 
-      case 'card':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Gateway
-              </label>
-              <select
-                value={formData.provider}
-                onChange={(e) => setFormData(prev => ({...prev, provider: e.target.value}))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">Select Gateway</option>
-                <option value="stripe">Stripe</option>
-                <option value="paypal">PayPal</option>
-                <option value="razorpay">Razorpay</option>
-              </select>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Payment Method Selection */}
+          <div>
+            <label className="block text-sm font-medium text-logo-gold mb-3">
+              Payment Method
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {['mobile', 'card', 'bank'].map((method) => (
+                <button
+                  key={method}
+                  type="button"
+                  onClick={() => handlePaymentMethodChange(method)}
+                  className={`p-3 rounded-md border-2 transition-colors font-bold ${
+                    paymentMethod === method
+                      ? 'border-logo-orange bg-logo-gold text-logo-deeporange'
+                      : 'border-logo-gold bg-logo-cream text-logo-gold hover:border-logo-orange'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-lg mb-1">
+                      {method === 'mobile' && '\ud83d\udcf1'}
+                      {method === 'card' && '\ud83d\udcb3'}
+                      {method === 'bank' && '\ud83c\udfe6'}
+                    </div>
+                    <div className="text-sm font-medium capitalize">{method}</div>
+                  </div>
+                </button>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Merchant ID
-              </label>
-              <input
-                type="text"
-                value={formData.config.merchantId || ''}
-                onChange={(e) => handleConfigChange('merchantId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter merchant ID"
-                required
-              />
+          </div>
+
+          {/* Label Field */}
+          <div>
+            <label className="block text-sm font-medium text-logo-gold mb-2">
+              Payment Method Label
+            </label>
+            <input
+              type="text"
+              value={formData.label}
+              onChange={(e) => setFormData(prev => ({...prev, label: e.target.value}))}
+              className="w-full px-3 py-2 border border-logo-gold rounded-md focus:outline-none focus:ring-2 focus:ring-logo-orange"
+              placeholder="Enter a label for this payment method"
+              required
+            />
+          </div>
+
+          {/* Payment Method Specific Fields */}
+          {renderPaymentMethodFields()}
+
+          {/* Message Display */}
+          {message && (
+            <div className={`p-4 rounded-md font-bold ${
+              message.includes('success') 
+                ? 'bg-logo-gold border border-logo-orange text-logo-cream'
+                : 'bg-logo-deeporange border border-logo-orange text-logo-cream'
+            }`}>
+              {message}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Secret Key
-              </label>
-              <input
-                type="password"
-                value={formData.config.secretKey || ''}
-                onChange={(e) => handleConfigChange('secretKey', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter secret key"
-                required
-              />
-            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-logo-orange text-logo-cream py-3 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
+          >
+            {loading ? 'Saving...' : 'Save Settings'}
+          </button>
+        </form>
+      </div>
+    </div>
           </div>
         );
 
@@ -177,9 +177,7 @@ const MerchantSettings = () => {
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bank Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
               <input
                 type="text"
                 value={formData.config.bankName || ''}
@@ -190,9 +188,7 @@ const MerchantSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Account Number
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
               <input
                 type="text"
                 value={formData.config.accountNumber || ''}
@@ -203,9 +199,7 @@ const MerchantSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Routing Number
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Routing Number</label>
               <input
                 type="text"
                 value={formData.config.routingNumber || ''}
@@ -227,7 +221,6 @@ const MerchantSettings = () => {
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Merchant Payment Settings</h2>
-
         {/* Current Settings Display */}
         {currentSettings && (
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -239,7 +232,6 @@ const MerchantSettings = () => {
             </div>
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Payment Method Selection */}
           <div>
@@ -270,7 +262,6 @@ const MerchantSettings = () => {
               ))}
             </div>
           </div>
-
           {/* Label Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -285,10 +276,8 @@ const MerchantSettings = () => {
               required
             />
           </div>
-
           {/* Payment Method Specific Fields */}
           {renderPaymentMethodFields()}
-
           {/* Message Display */}
           {message && (
             <div className={`p-4 rounded-md ${
@@ -299,7 +288,6 @@ const MerchantSettings = () => {
               {message}
             </div>
           )}
-
           {/* Submit Button */}
           <button
             type="submit"
@@ -312,6 +300,6 @@ const MerchantSettings = () => {
       </div>
     </div>
   );
-};
+}
 
 export default MerchantSettings;

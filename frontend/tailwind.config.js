@@ -15,6 +15,13 @@ export default {
           darkgray: '#333333',
           green: '#00FF00',
         },
+        logo: {
+          cream: '#fbf8ef',
+          teal: '#4ad9c3',
+          orange: '#ffaf3f',
+          deeporange: '#fc7812',
+          gold: '#feaf40',
+        },
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',

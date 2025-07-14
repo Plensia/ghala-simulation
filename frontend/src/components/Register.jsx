@@ -34,28 +34,29 @@ const Register = ({ onRegistered }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-md w-full bg-brand-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-logo-cream">
+      <div className="max-w-md w-full bg-logo-teal rounded-lg shadow-lg p-8 border border-logo-gold">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-brand-blue mb-2">Merchant Registration</h1>
-          <p className="text-brand-darkgray">Sign up to start using the platform</p>
+          <img src="/logo.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '60px', width: 'auto'}} />
+          <h1 className="text-3xl font-bold text-logo-deeporange mb-2">Merchant Registration</h1>
+          <p className="text-logo-cream">Sign up to start using the platform</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-            <input id="name" type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your name" required />
+            <label htmlFor="name" className="block text-sm font-medium text-logo-gold mb-2">Name</label>
+            <input id="name" type="text" value={name} onChange={e => setName(e.target.value)} className="w-full px-3 py-2 border border-logo-gold rounded-md focus:outline-none focus:ring-2 focus:ring-logo-orange" placeholder="Enter your name" required />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your email" required />
+            <label htmlFor="email" className="block text-sm font-medium text-logo-gold mb-2">Email</label>
+            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-3 py-2 border border-logo-gold rounded-md focus:outline-none focus:ring-2 focus:ring-logo-orange" placeholder="Enter your email" required />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" required />
+            <label htmlFor="password" className="block text-sm font-medium text-logo-gold mb-2">Password</label>
+            <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full px-3 py-2 border border-logo-gold rounded-md focus:outline-none focus:ring-2 focus:ring-logo-orange" placeholder="Enter your password" required />
           </div>
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">{error}</div>}
-          {success && <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">{success}</div>}
-          <button type="submit" disabled={loading} className="w-full bg-brand-blue text-brand-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">{loading ? 'Registering...' : 'Register'}</button>
+          {error && <div className="bg-logo-deeporange border border-logo-orange text-logo-cream px-4 py-3 rounded-md">{error}</div>}
+          {success && <div className="bg-logo-gold border border-logo-orange text-logo-cream px-4 py-3 rounded-md">{success}</div>}
+          <button type="submit" disabled={loading} className="w-full bg-logo-orange text-logo-cream py-2 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold">{loading ? 'Registering...' : 'Register'}</button>
         </form>
       </div>
     </div>

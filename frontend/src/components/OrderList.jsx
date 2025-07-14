@@ -117,12 +117,12 @@ const OrderList = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-logo-cream">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-brand-blue">Customer Orders</h2>
+        <h2 className="text-2xl font-bold text-logo-deeporange">Customer Orders</h2>
         <button
           onClick={createSampleOrder}
-          className="bg-brand-green text-brand-black px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+          className="bg-logo-teal text-logo-cream px-4 py-2 rounded-md hover:bg-logo-orange transition-colors font-bold"
         >
           Create Sample Order
         </button>
@@ -130,25 +130,25 @@ const OrderList = () => {
 
       {/* Order Statistics - moved above orders list and improved UI */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg shadow border border-blue-200 flex flex-col items-center">
+        <div className="bg-logo-gold p-3 rounded-lg shadow border border-logo-orange flex flex-col items-center">
           <div className="text-xl mb-1">📦</div>
-          <div className="text-xs font-medium text-blue-700">Total Orders</div>
-          <div className="text-lg font-bold text-blue-900 mt-0.5">{orders.length}</div>
+          <div className="text-xs font-medium text-logo-deeporange">Total Orders</div>
+          <div className="text-lg font-bold text-logo-cream mt-0.5">{orders.length}</div>
         </div>
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-3 rounded-lg shadow border border-yellow-200 flex flex-col items-center">
+        <div className="bg-logo-orange p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
           <div className="text-xl mb-1">⏳</div>
-          <div className="text-xs font-medium text-yellow-700">Pending</div>
-          <div className="text-lg font-bold text-yellow-900 mt-0.5">{orders.filter(o => o.status === 'pending').length}</div>
+          <div className="text-xs font-medium text-logo-cream">Pending</div>
+          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'pending').length}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg shadow border border-green-200 flex flex-col items-center">
+        <div className="bg-logo-teal p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
           <div className="text-xl mb-1">✅</div>
-          <div className="text-xs font-medium text-green-700">Paid</div>
-          <div className="text-lg font-bold text-green-900 mt-0.5">{orders.filter(o => o.status === 'paid').length}</div>
+          <div className="text-xs font-medium text-logo-cream">Paid</div>
+          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'paid').length}</div>
         </div>
-        <div className="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-lg shadow border border-red-200 flex flex-col items-center">
+        <div className="bg-logo-deeporange p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
           <div className="text-xl mb-1">❌</div>
-          <div className="text-xs font-medium text-red-700">Failed</div>
-          <div className="text-lg font-bold text-red-900 mt-0.5">{orders.filter(o => o.status === 'failed').length}</div>
+          <div className="text-xs font-medium text-logo-cream">Failed</div>
+          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'failed').length}</div>
         </div>
       </div>
 
