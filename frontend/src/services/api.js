@@ -1,49 +1,71 @@
-import axios from 'axios';
-
 const API_BASE_URL = 'http://localhost:5000/api';
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
-});
+export const apiService = {
+  // Orders API
+  async getOrders(token) {
+    const res = await fetch(`${API_BASE_URL}/orders`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    return await res.json();
+  },
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+  async createOrder(orderData, token) {
+    const res = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(orderData)
+    });
+    if (!res.ok) throw new Error('Failed to create order');
+    return await res.json();
+  },
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
+  async updateOrderStatus(orderId, status, token) {
+    // Assuming you want to confirm payment
+    const res = await fetch(`${API_BASE_URL}/orders/${orderId}/confirm-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) throw new Error('Failed to update order status');
+    return await res.json();
+  },
+
+  async simulatePayment(orderId, token) {
+    // This will trigger payment confirmation in backend
+    return this.updateOrderStatus(orderId, 'paid', token);
+  },
+
+  // Merchant Settings API
+  async getMerchantSettings(token) {
+    const res = await fetch(`${API_BASE_URL}/merchants/profile`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) throw new Error('Failed to fetch merchant settings');
+    return await res.json();
+  },
+
+  async updateMerchantSettings(settings, token) {
+    const res = await fetch(`${API_BASE_URL}/merchants/payment-method`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(settings)
+    });
+    if (!res.ok) throw new Error('Failed to update merchant settings');
+    return await res.json();
   }
-);
-
-export const authAPI = {
-  login: (credentials) => Promise.resolve({ data: { token: 'mock-token', merchant: { businessName: 'Test Merchant', email: 'test@ghala.com' } } }),
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
 };
-
-export const ordersAPI = {
-  getOrders: () => Promise.resolve({
-    data: [
-      { id: 1, product: 'Magic Mug', total: 10.99, status: 'pending', timestamp: new Date().toISOString() },
-      { id: 2, product: 'Dream Pillow', total: 15.49, status: 'paid', timestamp: new Date().toISOString() },
-    ],
-  }),
-  updateOrder: (orderId, data) => {
-    console.log(`Updating order ${orderId} with ${JSON.stringify(data)}`);
-    return Promise.resolve({ data: { ...data, id: orderId } });
-  },
-};
-
-export default api;

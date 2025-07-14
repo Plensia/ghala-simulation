@@ -1,420 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Eye, 
-  CreditCard, 
-  Clock, 
-  CheckCircle, 
-  XCircle,
-  Phone,
-  User,
-  DollarSign,
-  Calendar,
-  RefreshCw,
-  Download
-} from 'lucide-react';
-import { ordersAPI } from '../services/api';
+import { apiService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
-const OrderList = ({ onOrderUpdate }) => {
+const OrderList = () => {
   const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [actionLoading, setActionLoading] = useState({});
+  const [error, setError] = useState('');
+  const { user } = useAuth();
+  const token = user?.token;
 
   useEffect(() => {
-    loadOrders();
-  }, []);
-
-  useEffect(() => {
-    filterOrders();
-  }, [orders, searchTerm, statusFilter]);
+    if (token) {
+      loadOrders();
+    }
+    // eslint-disable-next-line
+  }, [token]);
 
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const response = await ordersAPI.getOrders();
-      setOrders(response.data);
-      if (onOrderUpdate) onOrderUpdate();
-    } catch (error) {
-      console.error('Error loading orders:', error);
+      const ordersData = await apiService.getOrders(token);
+      setOrders(ordersData);
+    } catch (err) {
+      setError('Failed to load orders');
     } finally {
       setLoading(false);
     }
   };
 
-  const filterOrders = () => {
-    let filtered = orders;
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(order => 
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerPhone.includes(searchTerm) ||
-        order._id.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status === statusFilter);
-    }
-
-    setFilteredOrders(filtered);
-  };
-
-  const handleConfirmPayment = async (orderId) => {
+  const simulatePayment = async (orderId) => {
     try {
-      setActionLoading({ ...actionLoading, [orderId]: true });
-      await ordersAPI.confirmPayment(orderId);
-      
-      // Refresh orders after 6 seconds to see status update
+      setOrders(prev => 
+        prev.map(order => 
+          order.id === orderId 
+            ? { ...order, status: 'processing' }
+            : order
+        )
+      );
+      await apiService.simulatePayment(orderId, token);
       setTimeout(() => {
         loadOrders();
-      }, 6000);
-      
-      // Show success message
-      alert('Payment confirmation triggered! Status will update in a few seconds.');
-    } catch (error) {
-      alert('Error confirming payment');
-    } finally {
-      setActionLoading({ ...actionLoading, [orderId]: false });
+      }, 1000);
+    } catch (err) {
+      setError('Failed to simulate payment');
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="w-4 h-4" />;
-      case 'paid':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'failed':
-        return <XCircle className="w-4 h-4" />;
-      default:
-        return <Clock className="w-4 h-4" />;
+  const createSampleOrder = async () => {
+    try {
+      // Realistic sample products
+      const products = [
+        { name: 'Laptop Stand', price: 20000 },
+        { name: 'Wired Headphones', price: 15000 },
+        { name: 'Coffee Mug', price: 8000 },
+        { name: 'Phone Case', price: 15000 }
+      ];
+      const item = products[Math.floor(Math.random() * products.length)];
+      const quantity = Math.floor(Math.random() * 3) + 1;
+      const total = item.price * quantity;
+      const sampleOrder = {
+        customerName: `Customer ${Date.now()}`,
+        customerPhone: `255${Math.floor(Math.random() * 1000000000)}`,
+        items: [
+          {
+            name: item.name,
+            quantity,
+            price: item.price
+          }
+        ],
+        total,
+        paymentMethod: 'mobile'
+      };
+      await apiService.createOrder(sampleOrder, token);
+      loadOrders();
+    } catch (err) {
+      setError('Failed to create sample order');
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800';
       case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800';
       case 'failed':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const CreateOrderForm = () => {
-    const [formData, setFormData] = useState({
-      customerName: '',
-      customerPhone: '',
-      items: [{ name: '', quantity: 1, price: 0 }],
-      paymentMethod: 'mobile'
-    });
-    const [creating, setCreating] = useState(false);
-
-    const handleChange = (e) => {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleItemChange = (index, field, value) => {
-      const newItems = [...formData.items];
-      newItems[index][field] = value;
-      setFormData({ ...formData, items: newItems });
-    };
-
-    const addItem = () => {
-      setFormData({
-        ...formData,
-        items: [...formData.items, { name: '', quantity: 1, price: 0 }]
-      });
-    };
-
-    const removeItem = (index) => {
-      const newItems = formData.items.filter((_, i) => i !== index);
-      setFormData({ ...formData, items: newItems });
-    };
-
-    const calculateTotal = () => {
-      return formData.items.reduce((total, item) => total + (item.quantity * item.price), 0);
-    };
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        setCreating(true);
-        const total = calculateTotal();
-        
-        await ordersAPI.createOrder({
-          ...formData,
-          total
-        });
-        
-        setShowCreateForm(false);
-        setFormData({
-          customerName: '',
-          customerPhone: '',
-          items: [{ name: '', quantity: 1, price: 0 }],
-          paymentMethod: 'mobile'
-        });
-        
-        loadOrders();
-        alert('Order created successfully!');
-      } catch (error) {
-        alert('Error creating order');
-      } finally {
-        setCreating(false);
-      }
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold">Create New Order</h3>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Customer Name *
-                </label>
-                <input
-                  type="text"
-                  name="customerName"
-                  value={formData.customerName}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Customer Phone *
-                </label>
-                <input
-                  type="tel"
-                  name="customerPhone"
-                  value={formData.customerPhone}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Method *
-              </label>
-              <select
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleChange}
-                className="select-field"
-              >
-                <option value="mobile">Mobile Money</option>
-                <option value="card">Card Payment</option>
-                <option value="bank">Bank Transfer</option>
-              </select>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Items *
-                </label>
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="btn-secondary text-sm"
-                >
-                  Add Item
-                </button>
-              </div>
-              
-              {formData.items.map((item, index) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Item name"
-                    value={item.name}
-                    onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                    className="input-field flex-1"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                    className="input-field w-20"
-                    min="1"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={item.price}
-                    onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value))}
-                    className="input-field w-24"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                  {formData.items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      className="btn-danger text-sm"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Total:</span>
-                <span className="text-xl font-bold">${calculateTotal().toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => setShowCreateForm(false)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={creating}
-                className="btn-primary"
-              >
-                {creating ? 'Creating...' : 'Create Order'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
-  const OrderDetailModal = ({ order, onClose }) => {
-    if (!order) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Order Details</h3>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-          
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">Customer Information</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <User className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>{order.customerName}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>{order.customerPhone}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
-                    <span className="capitalize">{order.paymentMethod}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">Order Information</h4>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>{new Date(order.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <DollarSign className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>${order.total?.toFixed(2) || '0.00'}</span>
-                  </div>
-                  <div className="flex items-center">
-                    {getStatusIcon(order.status)}
-                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-gray-900 mb-4">Items</h4>
-              <div className="space-y-3">
-                {order.items?.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-gray-600">Quantity: {item.quantity}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium">${(item.price * item.quantity).toFixed(2)}</div>
-                      <div className="text-sm text-gray-600">${item.price}/unit</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {order.status === 'pending' && (
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    handleConfirmPayment(order._id);
-                    onClose();
-                  }}
-                  disabled={actionLoading[order._id]}
-                  className="btn-primary"
-                >
-                  {actionLoading[order._id] ? 'Confirming...' : 'Confirm Payment'}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending':
+        return '⏳';
+      case 'processing':
+        return '⚡';
+      case 'paid':
+        return '✅';
+      case 'failed':
+        return '❌';
+      default:
+        return '❓';
+    }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -422,139 +118,137 @@ const OrderList = ({ onOrderUpdate }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Orders</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-brand-blue">Customer Orders</h2>
         <button
-          onClick={() => setShowCreateForm(true)}
-          className="btn-primary mt-4 sm:mt-0"
+          onClick={createSampleOrder}
+          className="bg-brand-green text-brand-black px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Order
+          Create Sample Order
         </button>
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search orders..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field pl-10"
-          />
+      {/* Order Statistics - moved above orders list and improved UI */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg shadow border border-blue-200 flex flex-col items-center">
+          <div className="text-xl mb-1">📦</div>
+          <div className="text-xs font-medium text-blue-700">Total Orders</div>
+          <div className="text-lg font-bold text-blue-900 mt-0.5">{orders.length}</div>
         </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="select-field pl-10"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-            <option value="failed">Failed</option>
-          </select>
+        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-3 rounded-lg shadow border border-yellow-200 flex flex-col items-center">
+          <div className="text-xl mb-1">⏳</div>
+          <div className="text-xs font-medium text-yellow-700">Pending</div>
+          <div className="text-lg font-bold text-yellow-900 mt-0.5">{orders.filter(o => o.status === 'pending').length}</div>
         </div>
-        <button
-          onClick={loadOrders}
-          className="btn-secondary whitespace-nowrap"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </button>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg shadow border border-green-200 flex flex-col items-center">
+          <div className="text-xl mb-1">✅</div>
+          <div className="text-xs font-medium text-green-700">Paid</div>
+          <div className="text-lg font-bold text-green-900 mt-0.5">{orders.filter(o => o.status === 'paid').length}</div>
+        </div>
+        <div className="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-lg shadow border border-red-200 flex flex-col items-center">
+          <div className="text-xl mb-1">❌</div>
+          <div className="text-xs font-medium text-red-700">Failed</div>
+          <div className="text-lg font-bold text-red-900 mt-0.5">{orders.filter(o => o.status === 'failed').length}</div>
+        </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
-                <tr key={order._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order._id.slice(-8)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{order.customerName}</div>
-                    <div className="text-sm text-gray-500">{order.customerPhone}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${order.total?.toFixed(2) || '0.00'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                      {getStatusIcon(order.status)}
-                      <span className="ml-1 capitalize">{order.status}</span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {orders.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-gray-500 text-lg mb-4">No orders found</div>
+          <p className="text-gray-400">Create a sample order to get started</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Order ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Items
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      #{order.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {order.customerName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {order.customerEmail}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">
+                        {order.items.map((item, index) => (
+                          <div key={index} className="mb-1">
+                            {item.name} x{item.quantity}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      TSh {order.total.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                        <span className="mr-1">{getStatusIcon(order.status)}</span>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {order.status === 'pending' && (
                         <button
-                          onClick={() => handleConfirmPayment(order._id)}
-                          disabled={actionLoading[order._id]}
-                          className="text-green-600 hover:text-green-900"
+                          onClick={() => simulatePayment(order.id)}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
                         >
-                          <CheckCircle className="w-4 h-4" />
+                          Simulate Payment
                         </button>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        {filteredOrders.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500">No orders found</div>
+                      {order.status === 'processing' && (
+                        <span className="text-blue-600 text-xs">Processing...</span>
+                      )}
+                      {(order.status === 'paid' || order.status === 'failed') && (
+                        <span className="text-gray-400 text-xs">Complete</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
-
-      {/* Modals */}
-      {showCreateForm && <CreateOrderForm />}
-      {selectedOrder && (
-        <OrderDetailModal 
-          order={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
-        />
+        </div>
       )}
     </div>
   );
