@@ -76,11 +76,7 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-sm text-gray-600 text-center">
-          <p>Demo credentials:</p>
-          <p>Email: <span className="font-mono bg-gray-100 px-1 rounded">demo@merchant.com</span></p>
-          <p>Password: <span className="font-mono bg-gray-100 px-1 rounded">password</span></p>
-        </div>
+        {/* Demo credentials removed */}
       </div>
     </div>
   );
