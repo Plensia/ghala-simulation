@@ -56,7 +56,7 @@ const Register = ({ onRegistered }) => {
           </div>
           {error && <div className="bg-logo-deeporange border border-logo-orange text-logo-cream px-4 py-3 rounded-md">{error}</div>}
           {success && <div className="bg-logo-gold border border-logo-orange text-logo-cream px-4 py-3 rounded-md">{success}</div>}
-          <button type="submit" disabled={loading} className="w-full bg-logo-orange text-logo-cream py-2 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold">{loading ? 'Registering...' : 'Register'}</button>
+          <button type="submit" disabled={loading} className="w-full bg-logo-orange text-logo-cream py-3 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold">{loading ? 'Registering...' : 'Register'}</button>
         </form>
       </div>
     </div>

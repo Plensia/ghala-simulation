@@ -25,7 +25,7 @@ const Dashboard = () => {
               <span className="text-sm text-logo-deeporange font-semibold">Welcome, {user?.name}</span>
               <button
                 onClick={logout}
-                className="bg-logo-teal text-logo-cream px-4 py-2 rounded-md hover:bg-logo-orange transition-colors font-bold"
+                className="bg-logo-cream text-logo-gold border-2 border-logo-orange px-4 py-2 rounded-md hover:border-logo-orange transition-colors font-bold"
               >
                 Logout
               </button>
@@ -42,10 +42,10 @@ const Dashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-bold text-sm transition-colors ${
+                className={`py-4 px-1 border-b-2 font-bold text-sm transition-colors bg-logo-cream text-logo-gold ${
                   activeTab === tab.id
-                    ? 'border-logo-orange text-logo-deeporange'
-                    : 'border-transparent text-logo-gold hover:text-logo-orange hover:border-logo-gold'
+                    ? 'border-logo-orange'
+                    : 'border-logo-gold hover:border-logo-orange'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>

@@ -81,98 +81,18 @@ const MerchantSettings = () => {
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Provider
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-logo-cream rounded-lg shadow-sm border border-logo-gold p-6">
-        <h2 className="text-2xl font-bold text-logo-deeporange mb-6">Merchant Payment Settings</h2>
-
-        {/* Current Settings Display */}
-        {currentSettings && (
-          <div className="mb-6 p-4 bg-logo-teal rounded-lg border border-logo-gold">
-            <h3 className="font-semibold text-logo-cream mb-2">Current Settings</h3>
-            <div className="text-sm text-logo-cream">
-              <p><strong>Payment Method:</strong> {currentSettings.paymentMethod}</p>
-              <p><strong>Provider:</strong> {currentSettings.provider}</p>
-              <p><strong>Label:</strong> {currentSettings.label}</p>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
+              <input
+                type="text"
+                value={formData.provider}
+                onChange={(e) => setFormData(prev => ({ ...prev, provider: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter provider name"
+                required
+              />
             </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Payment Method Selection */}
-          <div>
-            <label className="block text-sm font-medium text-logo-gold mb-3">
-              Payment Method
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {['mobile', 'card', 'bank'].map((method) => (
-                <button
-                  key={method}
-                  type="button"
-                  onClick={() => handlePaymentMethodChange(method)}
-                  className={`p-3 rounded-md border-2 transition-colors font-bold ${
-                    paymentMethod === method
-                      ? 'border-logo-orange bg-logo-gold text-logo-deeporange'
-                      : 'border-logo-gold bg-logo-cream text-logo-gold hover:border-logo-orange'
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="text-lg mb-1">
-                      {method === 'mobile' && '\ud83d\udcf1'}
-                      {method === 'card' && '\ud83d\udcb3'}
-                      {method === 'bank' && '\ud83c\udfe6'}
-                    </div>
-                    <div className="text-sm font-medium capitalize">{method}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Label Field */}
-          <div>
-            <label className="block text-sm font-medium text-logo-gold mb-2">
-              Payment Method Label
-            </label>
-            <input
-              type="text"
-              value={formData.label}
-              onChange={(e) => setFormData(prev => ({...prev, label: e.target.value}))}
-              className="w-full px-3 py-2 border border-logo-gold rounded-md focus:outline-none focus:ring-2 focus:ring-logo-orange"
-              placeholder="Enter a label for this payment method"
-              required
-            />
-          </div>
-
-          {/* Payment Method Specific Fields */}
-          {renderPaymentMethodFields()}
-
-          {/* Message Display */}
-          {message && (
-            <div className={`p-4 rounded-md font-bold ${
-              message.includes('success') 
-                ? 'bg-logo-gold border border-logo-orange text-logo-cream'
-                : 'bg-logo-deeporange border border-logo-orange text-logo-cream'
-            }`}>
-              {message}
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-logo-orange text-logo-cream py-3 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
-          >
-            {loading ? 'Saving...' : 'Save Settings'}
-          </button>
-        </form>
-      </div>
-    </div>
           </div>
         );
-
       case 'bank':
         return (
           <div className="space-y-4">
@@ -211,7 +131,6 @@ const MerchantSettings = () => {
             </div>
           </div>
         );
-
       default:
         return null;
     }
@@ -292,7 +211,7 @@ const MerchantSettings = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-logo-orange text-logo-cream py-3 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
           >
             {loading ? 'Saving...' : 'Save Settings'}
           </button>

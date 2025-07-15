@@ -122,7 +122,7 @@ const OrderList = () => {
         <h2 className="text-2xl font-bold text-logo-deeporange">Customer Orders</h2>
         <button
           onClick={createSampleOrder}
-          className="bg-logo-teal text-logo-cream px-4 py-2 rounded-md hover:bg-logo-orange transition-colors font-bold"
+          className="bg-logo-orange text-logo-cream py-3 px-4 rounded-md hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
         >
           Create Sample Order
         </button>
@@ -130,25 +130,25 @@ const OrderList = () => {
 
       {/* Order Statistics - moved above orders list and improved UI */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-        <div className="bg-logo-gold p-3 rounded-lg shadow border border-logo-orange flex flex-col items-center">
+        <div className="bg-yellow-50 p-3 rounded-lg shadow border border-yellow-200 flex flex-col items-center">
           <div className="text-xl mb-1">📦</div>
-          <div className="text-xs font-medium text-logo-deeporange">Total Orders</div>
-          <div className="text-lg font-bold text-logo-cream mt-0.5">{orders.length}</div>
+          <div className="text-xs font-medium text-yellow-700">Total Orders</div>
+          <div className="text-lg font-bold text-yellow-900 mt-0.5">{orders.length}</div>
         </div>
-        <div className="bg-logo-orange p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
+        <div className="bg-orange-50 p-3 rounded-lg shadow border border-orange-200 flex flex-col items-center">
           <div className="text-xl mb-1">⏳</div>
-          <div className="text-xs font-medium text-logo-cream">Pending</div>
-          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'pending').length}</div>
+          <div className="text-xs font-medium text-orange-700">Pending</div>
+          <div className="text-lg font-bold text-orange-900 mt-0.5">{orders.filter(o => o.status === 'pending').length}</div>
         </div>
-        <div className="bg-logo-teal p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
+        <div className="bg-teal-50 p-3 rounded-lg shadow border border-teal-200 flex flex-col items-center">
           <div className="text-xl mb-1">✅</div>
-          <div className="text-xs font-medium text-logo-cream">Paid</div>
-          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'paid').length}</div>
+          <div className="text-xs font-medium text-teal-700">Paid</div>
+          <div className="text-lg font-bold text-teal-900 mt-0.5">{orders.filter(o => o.status === 'paid').length}</div>
         </div>
-        <div className="bg-logo-deeporange p-3 rounded-lg shadow border border-logo-gold flex flex-col items-center">
+        <div className="bg-red-50 p-3 rounded-lg shadow border border-red-200 flex flex-col items-center">
           <div className="text-xl mb-1">❌</div>
-          <div className="text-xs font-medium text-logo-cream">Failed</div>
-          <div className="text-lg font-bold text-logo-gold mt-0.5">{orders.filter(o => o.status === 'failed').length}</div>
+          <div className="text-xs font-medium text-red-700">Failed</div>
+          <div className="text-lg font-bold text-red-900 mt-0.5">{orders.filter(o => o.status === 'failed').length}</div>
         </div>
       </div>
 
@@ -231,7 +231,7 @@ const OrderList = () => {
                       {order.status === 'pending' && (
                         <button
                           onClick={() => simulatePayment(order.id)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors"
+                          className="bg-logo-orange text-logo-cream py-2 px-3 rounded text-xs hover:bg-logo-gold focus:outline-none focus:ring-2 focus:ring-logo-orange focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold"
                         >
                           Simulate Payment
                         </button>
