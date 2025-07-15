@@ -11,6 +11,13 @@ const MerchantSettings = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentSettings, setCurrentSettings] = useState(null);
+  // AuthContext
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    // Try to get user from localStorage (if not using context)
+    const savedUser = localStorage.getItem('ghala_user');
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
 
   useEffect(() => {
     loadCurrentSettings();
@@ -18,14 +25,14 @@ const MerchantSettings = () => {
 
   const loadCurrentSettings = async () => {
     try {
-      const settings = await apiService.getMerchantSettings();
-      if (settings) {
+      const settings = await apiService.getMerchantSettings(user?.token);
+      if (settings && settings.paymentMethod) {
         setCurrentSettings(settings);
-        setPaymentMethod(settings.paymentMethod);
+        setPaymentMethod(settings.paymentMethod.type);
         setFormData({
-          label: settings.label || '',
-          provider: settings.provider || '',
-          config: settings.config || {}
+          label: settings.paymentMethod.config?.label || '',
+          provider: settings.paymentMethod.config?.provider || '',
+          config: settings.paymentMethod.config || {}
         });
       }
     } catch (error) {
@@ -58,16 +65,23 @@ const MerchantSettings = () => {
     setMessage('');
 
     try {
-      const settingsData = {
-        paymentMethod,
+      if (!user || !user.token) {
+        setMessage('You must be logged in to update settings.');
+        setLoading(false);
+        return;
+      }
+      const config = {
         label: formData.label,
         provider: formData.provider,
-        config: formData.config
+        ...formData.config
       };
-
-      await apiService.updateMerchantSettings(settingsData);
+      const settingsData = {
+        type: paymentMethod,
+        config
+      };
+      await apiService.updateMerchantSettings(settingsData, user.token);
       setMessage('Settings updated successfully!');
-      setCurrentSettings(settingsData);
+      await loadCurrentSettings();
     } catch (error) {
       setMessage('Failed to update settings. Please try again.');
     } finally {
@@ -145,9 +159,9 @@ const MerchantSettings = () => {
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold text-gray-700 mb-2">Current Settings</h3>
             <div className="text-sm text-gray-600">
-              <p><strong>Payment Method:</strong> {currentSettings.paymentMethod}</p>
-              <p><strong>Provider:</strong> {currentSettings.provider}</p>
-              <p><strong>Label:</strong> {currentSettings.label}</p>
+              <p><strong>Payment Method:</strong> {currentSettings.paymentMethod?.type || ''}</p>
+              <p><strong>Provider:</strong> {currentSettings.paymentMethod?.config?.provider || ''}</p>
+              <p><strong>Label:</strong> {currentSettings.paymentMethod?.config?.label || ''}</p>
             </div>
           </div>
         )}
