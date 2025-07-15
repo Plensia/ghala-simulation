@@ -40,36 +40,37 @@ This project simulates how **Ghala** handles merchant payment configuration and 
 | Async Jobs | `setTimeout` in PaymentService.js          |
 
 ## 🛠 Setup Instructions
-
 1. **Clone the repo**
    ```bash
    git clone https://github.com/your-username/ghala-simulation.git
    cd ghala-simulation/backen
-2. Install dependencies
+2. **Install dependencies**
 ```bash
 npm install
 ```
-Set up environment variables
+3.**Set up environment variables**
+
 Create a .env file in the backend/ directory with the following:
 env
 MONGO_URI=your-mongodb-uri
 JWT_SECRET=your-secret-key
 PORT=5000
 
-Start the backend server
+4.**Start the backend server**
 ```bash
 Copy
 Edit
 npm run dev
 ```
-Set up the frontend
+5.**Set up the frontend**
+
 Open a new terminal and run:
 ```bash
  cd ../frontend
  npm install
  npm run dev
 ```
-Access the application
+6.Access the application
 
 📂 Project Structure
 
@@ -117,6 +118,7 @@ Authorization: Bearer <your_jwt_token>
 
 
 🧠 Architecture + Thinking
+
 🔹 Supporting Multiple Merchants with Unique Configs
 Each merchant is stored with a unique record in the database containing their profile and paymentMethod object. Token-based auth ensures merchants access only their own data, enabling secure multi-tenant support.
 
