@@ -35,7 +35,7 @@ const Register = ({ onRegistered }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-logo-cream">
-      <div className="max-w-md w-full bg-logo-teal rounded-lg shadow-lg p-8 border border-logo-gold">
+      <div className="max-w-md w-full bg-logo-cream rounded-lg shadow-lg p-8 border border-logo-gold">
         <div className="text-center mb-8">
           <img src="/logo 2.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '60px', width: 'auto'}} />
           <h1 className="text-3xl font-bold text-logo-deeporange mb-2">Merchant Registration</h1>

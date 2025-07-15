@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+const Login = ({ setShowRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,8 +27,8 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-md w-full bg-brand-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <img src="/logo.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '60px', width: 'auto'}} />
-            <p className="text-logo-teal font-semibold text-lg">Sign in to manage your commerce platform</p>
+            <img src="/logo 2.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '120px', width: 'auto'}} />
+            <p className="text-logo-deeporange  font-semibold text-lg">Sign in to manage your commerce platform</p>
           </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -76,10 +77,14 @@ const Login = () => {
             </button>
         </form>
 
-        {/* Demo credentials removed */}
+        <div className="mt-6 text-center">
+          <button type="button" className="text-logo-orange font-semibold hover:underline" onClick={() => setShowRegister(true)}>
+            Don't have an account? Register here
+          </button>
+        </div>
       </div>
     </div>
-  );
+   );
 };
-
+};
 export default Login;

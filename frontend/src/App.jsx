@@ -25,12 +25,8 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-100">
       {user ? <Dashboard /> : <>
-        <Login />
-        <div className="text-center mt-4">
-          <button className="text-blue-600 underline" onClick={() => setShowRegister(true)}>
-            New merchant? Register here
-          </button>
-        </div>
+      <Login setShowRegister={setShowRegister} />
+        {/* Registration link now handled in Login.jsx */}
       </>}
     </div>
   );
