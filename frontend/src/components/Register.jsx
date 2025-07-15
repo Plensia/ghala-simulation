@@ -37,9 +37,9 @@ const Register = ({ onRegistered }) => {
     <div className="min-h-screen flex items-center justify-center bg-logo-cream">
       <div className="max-w-md w-full bg-logo-teal rounded-lg shadow-lg p-8 border border-logo-gold">
         <div className="text-center mb-8">
-          <img src="/logo.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '60px', width: 'auto'}} />
+          <img src="/logo 2.svg" alt="Shop Local Logo" className="mx-auto mb-2" style={{height: '60px', width: 'auto'}} />
           <h1 className="text-3xl font-bold text-logo-deeporange mb-2">Merchant Registration</h1>
-          <p className="text-logo-cream">Sign up to start using the platform</p>
+          <p className="text-logo-deeporange font-bold">Sign up to start using the platform</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
